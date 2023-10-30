@@ -150,7 +150,7 @@ def get_bs_samples(n_samples, met_zone_codes,
             bs_idxs=idxs
         )
 
-    bs_results.append(results)
+        bs_results.append(results)
     results_df = dd.from_delayed(bs_results, meta=meta)
     results_df.to_parquet(opath / 'bs_results.parquet')
     print('Done.')
