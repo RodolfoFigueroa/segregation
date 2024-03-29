@@ -160,7 +160,7 @@ cython_debug/
 #.idea/
 
 # Other
-output
+output*
 *.ipynb
 dask-worker-space/
 poetry.lock
