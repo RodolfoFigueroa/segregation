@@ -3,8 +3,8 @@ import os
 import time
 import yaml
 
-from bootstrap import get_bs_samples
-from plots import make_all
+from segregation.bootstrap import get_bs_samples
+from segregation.plots import make_all
 from pathlib import Path
 
 
@@ -22,8 +22,7 @@ def check_positive(value):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Estimate segregation indices using IPF "
-        "with bootstraping confidence intervals."
+        description="Estimate segregation indices using IPF with bootstraping confidence intervals."
     )
     parser.add_argument(
         "CVE_SUN",

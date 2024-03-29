@@ -1,7 +1,6 @@
 import dask.dataframe as dd
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import segregation.preprocessing as preprocessing
 
 from dask import delayed
@@ -156,8 +155,8 @@ def get_bs_samples(
     # Create dicts to store the H index and centralization indices
     # for each sample, as
     print(f"Runnning for {n_samples} bootstrap samples ...")
-    bs_results = []
-    for idxs in bs_idxs:
+    bs_results = [None] * len(bs_idxs)
+    for i, idxs in enumerate(bs_idxs):
         # Bootstrap resampling
         df_survey_partial = df_survey.copy()
         df_survey_partial = df_survey_partial.iloc[idxs]
@@ -172,7 +171,7 @@ def get_bs_samples(
             write_to_disk=False,
         )
 
-        bs_results.append(results)
+        bs_results[i] = results
     results_df = dd.from_delayed(bs_results, meta=meta)
     results_df.to_parquet(opath / "bs_results.parquet")
     print("Done.")

@@ -101,11 +101,6 @@ def get_seg_full(
     )
 
     results_dict["H"] = H
-    if write_to_disk:
-        df_cdf.to_csv(out_path / "ecdf_income_per_ageb.csv")
-        norm_H_series.to_csv(out_path / "H_index_per_percentile.csv")
-        mean_kl_series.to_csv(out_path / "mean_KL_per_percentile.csv")
-        local_kl.to_csv(out_path / "KL_per_ageb_per_pecentile.csv")
 
     # Create a dataframe with population per income bracket per ageb
     # Marginalizing over all other variables in all local
@@ -117,8 +112,6 @@ def get_seg_full(
     # Keep only agebs witg geometry (error in marco geo?)
     agebs = pop_income[~pop_income.geometry.isna()].cvegeo.to_list()
     pop_income = pop_income.dropna()
-    if write_to_disk:
-        pop_income.to_file(out_path / "income_quantiles.gpkg")
 
     # Find local centralization index for top and low percentiles
     cent_idx_dict = {}
@@ -140,7 +133,11 @@ def get_seg_full(
         if write_to_disk:
             C_list.append(C)
 
-    results_dict["cent_idx"] = cent_idx_dict
+    results_dict["cent_idx"] = cent_idx_dict        
+
+    # Return a dataframe
+    results = reshape_results(results_dict)        
+
     if write_to_disk:
         C_xr = xr.DataArray(
             data=np.stack(C_list, axis=0),
@@ -160,11 +157,14 @@ def get_seg_full(
         )
         C_ds = xr.Dataset({"centrality": C_xr, "n_info": n_info})
         C_ds.to_netcdf(path=out_path / "centrality_index.nc", engine="netcdf4")
+        
+        df_cdf.to_csv(out_path / "ecdf_income_per_ageb.csv")
+        norm_H_series.to_csv(out_path / "H_index_per_percentile.csv")
+        mean_kl_series.to_csv(out_path / "mean_KL_per_percentile.csv")
+        local_kl.to_csv(out_path / "KL_per_ageb_per_pecentile.csv")
 
-    # Return a dataframe
-    results = reshape_results(results_dict)
-    if write_to_disk:
-        # Store results as a pickle object
+        pop_income.to_file(out_path / "income_quantiles.gpkg")
+
         with open(out_path / "results.pkl", "wb") as f:
             pickle.dump(results, f)
 
