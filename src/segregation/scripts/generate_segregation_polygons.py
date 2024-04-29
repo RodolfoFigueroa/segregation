@@ -68,4 +68,3 @@ for opath in output_path.glob("M*"):
 
         out_df["is_significant"] = ~get_not_significant_mask(bs_array)
         out_df.to_file(out_dir / f"q_{q}.k_{k}.gpkg")
-    break
