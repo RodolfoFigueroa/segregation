@@ -8,6 +8,7 @@ import xarray as xr
 from pathlib import Path
 from segregation import seg, ipf
 
+
 def flatten_res(res, prefix=""):
     new = {}
     for k, v in res.items():
@@ -133,10 +134,10 @@ def get_seg_full(
         if write_to_disk:
             C_list.append(C)
 
-    results_dict["cent_idx"] = cent_idx_dict        
+    results_dict["cent_idx"] = cent_idx_dict
 
     # Return a dataframe
-    results = reshape_results(results_dict)        
+    results = reshape_results(results_dict)
 
     if write_to_disk:
         C_xr = xr.DataArray(
@@ -157,7 +158,7 @@ def get_seg_full(
         )
         C_ds = xr.Dataset({"centrality": C_xr, "n_info": n_info})
         C_ds.to_netcdf(path=out_path / "centrality_index.nc", engine="netcdf4")
-        
+
         df_cdf.to_csv(out_path / "ecdf_income_per_ageb.csv")
         norm_H_series.to_csv(out_path / "H_index_per_percentile.csv")
         mean_kl_series.to_csv(out_path / "mean_KL_per_percentile.csv")

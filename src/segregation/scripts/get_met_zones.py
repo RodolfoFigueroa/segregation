@@ -8,11 +8,7 @@ import pandas as pd
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "year",
-        help="Census year.",
-        type=int
-    )
+    parser.add_argument("year", help="Census year.", type=int)
 
     args = parser.parse_args()
 
@@ -25,12 +21,17 @@ if __name__ == "__main__":
     elif args.year == 2024:
         df = gpd.read_file("./data/mpios/mpios_en_metropoli.shp")
 
-        df_filtered = df[(df["TIPOMET"] == "Zona metropolitana") | (df["TIPOMET"] == "Metrópoli municipal")].copy()
+        df_filtered = df[
+            (df["TIPOMET"] == "Zona metropolitana")
+            | (df["TIPOMET"] == "Metrópoli municipal")
+        ].copy()
         df_filtered["CVEGEO"] = df_filtered["CVEGEO"].astype(int)
-        df_filtered["CVE_ZONA"] = df_filtered["CVE_ZONA"].str.split(".").apply(lambda x: f"M{x[0]}.{x[2]}")
+        df_filtered["CVE_ZONA"] = (
+            df_filtered["CVE_ZONA"].str.split(".").apply(lambda x: f"M{x[0]}.{x[2]}")
+        )
 
         out = df_filtered.groupby("CVE_ZONA")["CVEGEO"].apply(lambda x: list(x))
-    
+
     out = out.to_dict()
 
     if not os.path.isdir("./output"):

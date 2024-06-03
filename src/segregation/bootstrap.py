@@ -121,7 +121,7 @@ def get_bs_samples(
     # Load survey with processed linking and target columns
     # This discretizes income into q quantiles into
     # columns Ingreso and keeps continuos income in Ingreso_orig.
-    linking_cols=["Sexo", "Edad", "Nivel", "SeguroIMSS", "SeguroPriv", "ConexionInt"]
+    linking_cols = ["Sexo", "Edad", "Nivel", "SeguroIMSS", "SeguroPriv", "ConexionInt"]
     df_survey = preprocessing.load_survey(data_path, met_zone_codes, linking_cols, q)
     df_survey.to_csv(opath / "survey.csv")
 

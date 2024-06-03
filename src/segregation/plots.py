@@ -297,7 +297,7 @@ def make_all(met_zone_codes, opath, inpath):
     plot_income_pc(pop_income, met_zone_codes, inpath, fig_path)
     print("Done.")
 
-    # Centrality 
+    # Centrality
     print("Making plot of centrality index ...")
 
     fig, ax, max_k, max_c = prepare_cent_plot(pop_income, C_ds)
@@ -311,7 +311,7 @@ def make_all(met_zone_codes, opath, inpath):
         for k in [5, max_k]:
             prefix = f"cent_idx.q_{q}.k_{k}."
             wanted_cols = [col for col in columns if col.startswith(prefix)]
-            
+
             parquet_files = os.listdir(opath / "bs_results.parquet")
             n_samples = len(parquet_files)
             bs_array = np.empty((n_samples, len(wanted_cols)), dtype=float)
@@ -321,8 +321,16 @@ def make_all(met_zone_codes, opath, inpath):
                 parquet = np.asarray(parquet)
                 parquet = parquet.squeeze()
                 bs_array[i, :] = parquet
-                
-            plot_income_q(pop_income, C_ds, bs_array, ax=ax[plot_count // 2, plot_count % 2], q=q, k=k, vmax=max_c)
+
+            plot_income_q(
+                pop_income,
+                C_ds,
+                bs_array,
+                ax=ax[plot_count // 2, plot_count % 2],
+                q=q,
+                k=k,
+                vmax=max_c,
+            )
             plot_count += 1
 
     gs = ax[0, 0].get_gridspec()
