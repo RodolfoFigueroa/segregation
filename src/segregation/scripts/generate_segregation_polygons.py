@@ -57,7 +57,7 @@ def main():
         "CVE_SUN",
         default=None,
         help="Metropolitan zone identifier from the national urban system (SUN). See met_zones.yaml for a list. If not given, all available files will be processed.",
-        required=False,
+        nargs="?",
     )
 
     args = parser.parse_args()
