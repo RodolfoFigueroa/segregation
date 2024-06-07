@@ -19,7 +19,7 @@ def main():
         if opath.name.startswith("m"):  # Windows is case-insensitive
             continue
 
-        cve = opath.stem
+        cve = opath.name
         met_zone_codes = met_zones[cve]
 
         df_income = gpd.read_file(opath / "income_quantiles.gpkg")
