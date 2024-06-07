@@ -12,6 +12,9 @@ def main():
     data_path = Path("./data")
     output_path = Path("./output")
 
+    income_path = Path("./incomes")
+    income_path.mkdir(exist_ok=True)
+
     with open("./output/met_zones.yaml", "r") as f:
         met_zones = yaml.safe_load(f)
 
@@ -32,4 +35,4 @@ def main():
         df_income_combined = df_income.copy()[["cvegeo", "income_pc", "geometry"]]
         df_income_combined = pd.concat([df_income_combined, df_missing])
         df_income_combined = df_income_combined.reset_index(drop=True)
-        df_income_combined.to_file(f"./incomes/{cve}.gpkg")
+        df_income_combined.to_file(income_path / f"{cve}.gpkg")
