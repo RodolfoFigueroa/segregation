@@ -20,6 +20,7 @@ pyarrow = "^11.0.0"
 datashader = "^0.14.4"
 holoviews = "^1.15.4"
 pre-commit = "^3.5.0"
+pygeos = "^0.14"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.25.1"
@@ -27,6 +28,7 @@ ipykernel = "^6.25.1"
 [tool.poetry.scripts]
 generate-income-polygons = "segregation.scripts.generate_income_polygons:main"
 generate-segregation-polygons = "segregation.scripts.generate_segregation_polygons:main"
+merge-polygons = "segregation.scripts.merge_polygons:main"
 
 [build-system]
 requires = ["poetry-core"]

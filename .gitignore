@@ -162,8 +162,8 @@ cython_debug/
 # Other
 output*
 *.ipynb
+centrality*/
 dask-worker-space/
+income/
 poetry.lock
 results/
-centrality/
-centrality_old/

@@ -172,7 +172,7 @@ def plot_income_q(pop_income, C_ds, bs_array, ax, q, k, vmax):
     )
     ax.text(0.05, 0.05, f"Q: {q}, K: {k}", transform=ax.transAxes)
 
-    # Mark non significant agebs
+    # Mask non significant agebs
     mask = get_not_significant_mask(bs_array)
     mask_gdf = pop_income[mask]
     mask_gdf.plot(legend=False, ax=ax, edgecolor="k", facecolor="none", linewidth=LW)
