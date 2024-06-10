@@ -140,7 +140,7 @@ def plot_income_pc(pop_income, met_zone_codes, data_path, fig_path=None):
         fig.savefig(fig_path / "income_pc.pdf", dpi=DPI)
 
 
-def get_not_significant_mask(bs_array):
+def get_significant_mask(bs_array):
     ci = bootstrap.ci_single(bs_array, conf_level=0.99)
     mask = np.sign(ci[:, 0]) != np.sign(ci[:, 1])
     return mask
@@ -173,7 +173,7 @@ def plot_income_q(pop_income, C_ds, bs_array, ax, q, k, vmax):
     ax.text(0.05, 0.05, f"Q: {q}, K: {k}", transform=ax.transAxes)
 
     # Mask non significant agebs
-    mask = get_not_significant_mask(bs_array)
+    mask = get_significant_mask(bs_array)
     mask_gdf = pop_income[mask]
     mask_gdf.plot(legend=False, ax=ax, edgecolor="k", facecolor="none", linewidth=LW)
 

@@ -165,5 +165,6 @@ output*
 centrality*/
 dask-worker-space/
 income/
+merged/
 poetry.lock
 results/

@@ -7,7 +7,7 @@ import pyarrow.parquet as pq
 import xarray as xr
 
 from pathlib import Path
-from segregation.plots import get_not_significant_mask
+from segregation.plots import get_significant_mask
 from segregation.scripts.common import process_cve
 
 
@@ -47,7 +47,7 @@ def process_output(opath, cent_path):
 
         out_df = pop_income[[col_name, "cvegeo", "geometry"]].copy()
 
-        out_df["is_significant"] = ~get_not_significant_mask(bs_array)
+        out_df["is_significant"] = get_significant_mask(bs_array)
         out_df.to_file(out_dir / f"q_{q}.k_{k}.gpkg")
 
 
