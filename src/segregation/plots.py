@@ -1,6 +1,7 @@
 import os
 import re
 import warnings
+from pathlib import Path
 
 import datashader as ds
 import geopandas as gpd
@@ -9,16 +10,13 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import pyarrow as pa
 import pyarrow.parquet as pq
 import xarray as xr
-
 from holoviews.operation.datashader import datashade
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from matplotlib import cm
-from pathlib import Path
-from segregation import bootstrap
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
+from segregation import bootstrap
 
 WIDTH = 6.4
 HEIGHT = 4.8
@@ -36,7 +34,7 @@ plt.rcParams.update(
         "ps.usedistiller": "xpdf",
         "ps.fonttype": 42,
         "pdf.fonttype": 42,
-    }
+    },
 )
 mpl.use("agg")
 
@@ -59,7 +57,7 @@ def plot_H_KL(df_cdf, norm_H_series, mean_kl_series, fig_path=None):
     ax_ins.yaxis.set_label_position("right")
     ax_ins.set_ylabel("$F(y)$")
     df_cdf.set_index(df_cdf.index, drop=True).plot(
-        legend=False, ax=ax_ins, color="grey", alpha=0.5
+        legend=False, ax=ax_ins, color="grey", alpha=0.5,
     )
     ax_ins.semilogx(df_cdf.index, df_cdf.w_MZ, color="k", lw=2)
     ax_ins.set_xlabel("$y$")
@@ -86,12 +84,12 @@ def get_missing_agebs(met_zone_codes, data_path, pop_income):
         [
             gpd.read_file(f"{data_path}/agebs.zip", layer=f"{scode:02d}a")
             for scode in scodes
-        ]
+        ],
     )
 
     agebs_gdf = agebs_gdf.to_crs(agebs_gdf.estimate_utm_crs())
     agebs_gdf["CVE_MZ"] = agebs_gdf.CVE_ENT.astype(
-        int
+        int,
     ) * 1000 + agebs_gdf.CVE_MUN.astype(int)
     agebs_gdf = agebs_gdf[agebs_gdf["CVE_MZ"].isin(met_zone_codes)]
     agebs_gdf.columns = [i.lower() for i in agebs_gdf.columns]
@@ -200,7 +198,7 @@ def prepare_cent_plot(pop_income, C_ds):
 
     if max_k < 100:
         warnings.warn(
-            "Max number of k-neighbors less than 100. Value has been automatically adjusted."
+            "Max number of k-neighbors less than 100. Value has been automatically adjusted.",
         )
 
     # Find maximum abs index
@@ -225,7 +223,7 @@ def plot_ci(points_estimates, c_intervals, ax, q, k):
 
 def plot_cis(res_bs, fig_path=None):
     fig, axg = plt.subplots(
-        2, 2, figsize=(WIDTH, WIDTH), dpi=DPI, sharex=True, sharey=True
+        2, 2, figsize=(WIDTH, WIDTH), dpi=DPI, sharex=True, sharey=True,
     )
     axes = axg.ravel()
 
@@ -281,10 +279,10 @@ def make_all(met_zone_codes, opath, inpath):
     pop_income = gpd.read_file(opath / "income_quantiles.gpkg")
     df_cdf = pd.read_csv(opath / "ecdf_income_per_ageb.csv", index_col="Ingreso_orig")
     norm_H_series = pd.read_csv(
-        opath / "H_index_per_percentile.csv", index_col="Ingreso_orig"
+        opath / "H_index_per_percentile.csv", index_col="Ingreso_orig",
     )
     mean_kl_series = pd.read_csv(
-        opath / "mean_KL_per_percentile.csv", index_col="Ingreso_orig"
+        opath / "mean_KL_per_percentile.csv", index_col="Ingreso_orig",
     )
     C_ds = xr.open_dataset(opath / "centrality_index.nc")
     print("Done.")
@@ -342,7 +340,7 @@ def make_all(met_zone_codes, opath, inpath):
         axx.remove()
 
     sm = cm.ScalarMappable(
-        norm=mpl.colors.Normalize(vmin=-max_c, vmax=max_c), cmap="RdBu"
+        norm=mpl.colors.Normalize(vmin=-max_c, vmax=max_c), cmap="RdBu",
     )
     plt.colorbar(sm, cax=cax, orientation="horizontal")
 

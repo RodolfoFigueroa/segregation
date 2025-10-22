@@ -1,5 +1,4 @@
 import numpy as np
-
 from scipy import integrate
 from scipy.special import xlogy
 from sklearn.neighbors import KDTree
@@ -8,7 +7,7 @@ from sklearn.neighbors import KDTree
 def binary_entropy(p):
     p = np.asanyarray(p)
     e = np.zeros_like(p)
-    mask = np.logical_and(0 < p, p < 1)
+    mask = np.logical_and(p > 0, p < 1)
     pm = p[mask]
     e[mask] = -pm * np.log2(pm) - (1 - pm) * np.log2(1 - pm)
     return e
@@ -86,7 +85,7 @@ def local_cent(gdf, x_name="q_5", total_name="total_ipf"):
     points = np.hstack([xp, yp])
     tree = KDTree(points)
     dlist, nlist = tree.query(
-        points, k=len(points), sort_results=True, return_distance=True
+        points, k=len(points), sort_results=True, return_distance=True,
     )
 
     # Get an array of population counts for the required quantile

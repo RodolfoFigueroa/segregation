@@ -1,10 +1,10 @@
-import yaml
+from pathlib import Path
 
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+import yaml
 
-from pathlib import Path
 from segregation.plots import get_missing_agebs
 from segregation.scripts.common import process_cve
 
@@ -33,7 +33,7 @@ def main():
     income_path = Path("./income")
     income_path.mkdir(exist_ok=True)
 
-    with open("./output/met_zones.yaml", "r") as f:
+    with open("./output/met_zones.yaml") as f:
         met_zones = yaml.safe_load(f)
 
     process_cve(process_output, output_path, data_path, income_path, met_zones)

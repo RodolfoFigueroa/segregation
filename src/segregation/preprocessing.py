@@ -1,7 +1,8 @@
-import pandas as pd
-from pathlib import Path
-import numpy as np
 from collections import defaultdict
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
 
 
 def load_survey(data_path, met_zone_codes, linking_cols, q):
@@ -112,17 +113,17 @@ def load_survey(data_path, met_zone_codes, linking_cols, q):
 
     df_ind["SeguroIMSS"] = df_ind["SeguroIMSS"].astype("category")
     df_ind["SeguroIMSS"] = df_ind["SeguroIMSS"].cat.rename_categories(
-        {0: "no_imss", 1: "imss"}
+        {0: "no_imss", 1: "imss"},
     )
 
     df_ind["SeguroPriv"] = df_ind["SeguroPriv"].astype("category")
     df_ind["SeguroPriv"] = df_ind["SeguroPriv"].cat.rename_categories(
-        {0: "no_privado", 6: "privado"}
+        {0: "no_privado", 6: "privado"},
     )
 
     df_ind["ConexionInt"] = df_ind["ConexionInt"].astype("category")
     df_ind["ConexionInt"] = df_ind["ConexionInt"].cat.rename_categories(
-        {1: "internet", 2: "no_internet"}
+        {1: "internet", 2: "no_internet"},
     )
 
     if "EstadoConyu" in linking_cols:
@@ -204,16 +205,16 @@ def load_census(data_path, met_zone_codes):
 
     # Create CVEGEO column, and drop columns no longer useful
     df_censo["cvegeo"] = df_censo.apply(
-        lambda x: f"{x.ENTIDAD:02}{x.MUN:03}{x.LOC:04}{x.AGEB.zfill(4)}", axis=1
+        lambda x: f"{x.ENTIDAD:02}{x.MUN:03}{x.LOC:04}{x.AGEB.zfill(4)}", axis=1,
     )
     df_censo.drop(
-        columns=["ENTIDAD", "MUN", "NOM_LOC", "LOC", "AGEB", "NOM_MUN"], inplace=True
+        columns=["ENTIDAD", "MUN", "NOM_LOC", "LOC", "AGEB", "NOM_MUN"], inplace=True,
     )
 
     # Remove null values and make integer, except fractional counts
     df_censo = df_censo.dropna()
     int_cols = df_censo.columns.drop(["PROM_OCUP", "cvegeo"]).copy()
-    df_censo = df_censo.astype({col: int for col in int_cols})
+    df_censo = df_censo.astype(dict.fromkeys(int_cols, int))
 
     # Remove AGEBS with less than 20 in working population
     df_censo = df_censo[df_censo["P_15YMAS"] > 20].copy()
@@ -242,7 +243,7 @@ def load_census(data_path, met_zone_codes):
     df_censo["Nivel_ninguno"] = df_censo["P15YM_SE"] + df_censo["P15PRI_IN"]
     df_censo["Nivel_primaria"] = df_censo["P15PRI_CO"] + df_censo["P15SEC_IN"]
     df_censo.drop(
-        columns=["P15YM_SE", "P15PRI_IN", "P15PRI_CO", "P15SEC_IN"], inplace=True
+        columns=["P15YM_SE", "P15PRI_IN", "P15PRI_CO", "P15SEC_IN"], inplace=True,
     )
     # Rename variables
     df_censo.rename(

@@ -33,3 +33,11 @@ merge-polygons = "segregation.scripts.merge_polygons:main"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["D"]
+
+[tool.basedpyright]
+typeCheckingMode = "standard"
+ignore = ["**/*.ipynb"]

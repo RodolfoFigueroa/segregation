@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import geopandas as gpd
 import numpy as np
@@ -6,7 +7,6 @@ import pandas as pd
 import pyarrow.parquet as pq
 import xarray as xr
 
-from pathlib import Path
 from segregation.plots import get_significant_mask
 from segregation.scripts.common import process_cve
 
