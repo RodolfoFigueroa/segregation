@@ -1,11 +1,12 @@
 import argparse
 import os
 import time
+from pathlib import Path
+
 import yaml
 
 from segregation.bootstrap import get_bs_samples
 from segregation.plots import make_all
-from pathlib import Path
 
 
 def check_positive(value):
@@ -13,16 +14,16 @@ def check_positive(value):
         value = int(value)
         if value < 0:
             raise argparse.ArgumentTypeError(
-                "{} is not a postivive integer.".format(value)
+                f"{value} is not a postivive integer.",
             )
     except ValueError:
-        raise argparse.ArgumentTypeError("{} is not a postivive integer.".format(value))
+        raise argparse.ArgumentTypeError(f"{value} is not a postivive integer.")
     return value
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Estimate segregation indices using IPF with bootstraping confidence intervals."
+        description="Estimate segregation indices using IPF with bootstraping confidence intervals.",
     )
     parser.add_argument(
         "CVE_SUN",
@@ -46,14 +47,14 @@ if __name__ == "__main__":
         help="Print total execution time.",
     )
     parser.add_argument(
-        "--seed", default=123456, type=int, help="Seed for random number generation."
+        "--seed", default=123456, type=int, help="Seed for random number generation.",
     )
 
     args = parser.parse_args()
     assert args.n_samples <= 10000
     print(
         f"Initiating estimation for metropolitan zone {args.CVE_SUN}"
-        f" with {args.n_samples} samples."
+        f" with {args.n_samples} samples.",
     )
 
     # Load met_zones
@@ -61,7 +62,7 @@ if __name__ == "__main__":
     if not os.path.exists("./output/met_zones.yaml"):
         raise Exception("met_zones.yaml not found. Run get_met_zones.py first.")
 
-    with open("./output/met_zones.yaml", "r") as f:
+    with open("./output/met_zones.yaml") as f:
         met_zones = yaml.safe_load(f)
     met_zone_codes = met_zones[args.CVE_SUN]
 

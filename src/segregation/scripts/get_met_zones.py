@@ -1,10 +1,9 @@
 import argparse
 import os
-import yaml
 
 import geopandas as gpd
 import pandas as pd
-
+import yaml
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

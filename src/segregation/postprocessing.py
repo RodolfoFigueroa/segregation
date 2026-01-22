@@ -1,7 +1,9 @@
-import pandas as pd
-from pathlib import Path
-import segregation.bootstrap as bootstrap
 import pickle
+from pathlib import Path
+
+import pandas as pd
+
+from segregation import bootstrap
 
 opath = Path("output/")
 met_paths = sorted(list(opath.glob("M*.*")))
@@ -26,7 +28,7 @@ for mpath in met_paths:
             "median_income": point_med_income,
             "median_low": median_ci[0],
             "median_high": median_ci[1],
-        }
+        },
     )
 
 res_df = pd.DataFrame(met_res)

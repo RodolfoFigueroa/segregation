@@ -1,8 +1,8 @@
 import re
+from pathlib import Path
 
 import geopandas as gpd
 
-from pathlib import Path
 from segregation.scripts.common import get_cve_from_args
 
 
@@ -20,7 +20,7 @@ def process_output(opath, cent_path, out_path):
 
     first_cent_frame = gpd.read_file(first_cent_path)
     first_cent_frame = first_cent_frame.rename(
-        columns={"is_significant": f"significant_q_{q}_k_{k}"}
+        columns={"is_significant": f"significant_q_{q}_k_{k}"},
     )
 
     for centrality_path in centrality_paths:

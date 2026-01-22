@@ -1,14 +1,15 @@
+from pathlib import Path
+
 import dask.dataframe as dd
 import matplotlib.pyplot as plt
 import numpy as np
-import segregation.preprocessing as preprocessing
-
 from dask import delayed
 from dask.distributed import Client
-from segregation.estimate import get_seg_full
 from numpy.random import default_rng
-from pathlib import Path
 from scipy.optimize import brentq
+
+from segregation import preprocessing
+from segregation.estimate import get_seg_full
 
 
 def ci_single(x, conf_level=0.95):
@@ -55,8 +56,7 @@ def ci_simultaneous(alpha_col, x, return_mask=False):
 
     if return_mask:
         return rho, mask
-    else:
-        return rho
+    return rho
 
 
 def ci_opt(alpha_col, alpha_target, x):
