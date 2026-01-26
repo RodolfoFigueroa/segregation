@@ -252,7 +252,7 @@ def plot_cis(res_bs, fig_path=None):
                 out_str = f"cent_idx.q_{q}.k_{k}"
                 c_list.append(out_str)
 
-    for c, ax in zip(c_list, axes):
+    for c, ax in zip(c_list, axes, strict=False):
         q = c.split("q_")[1].split(".")[0]
         k = c.split("k_")[1].split(".")[0]
 

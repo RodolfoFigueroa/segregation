@@ -198,7 +198,7 @@ def load_census(data_path, met_zone_codes):
     # Filter by state and met zone
     df_list = [
         df[(df["ENTIDAD"] == scode) & (df["MUN"].isin(s_codes[scode]))].copy()
-        for df, scode in zip(df_list, s_codes.keys())
+        for df, scode in zip(df_list, s_codes.keys(), strict=False)
     ]
 
     df_censo = pd.concat(df_list, ignore_index=True, copy=True)
