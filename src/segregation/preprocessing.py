@@ -205,10 +205,12 @@ def load_census(data_path, met_zone_codes):
 
     # Create CVEGEO column, and drop columns no longer useful
     df_censo["cvegeo"] = df_censo.apply(
-        lambda x: f"{x.ENTIDAD:02}{x.MUN:03}{x.LOC:04}{x.AGEB.zfill(4)}", axis=1,
+        lambda x: f"{x.ENTIDAD:02}{x.MUN:03}{x.LOC:04}{x.AGEB.zfill(4)}",
+        axis=1,
     )
     df_censo.drop(
-        columns=["ENTIDAD", "MUN", "NOM_LOC", "LOC", "AGEB", "NOM_MUN"], inplace=True,
+        columns=["ENTIDAD", "MUN", "NOM_LOC", "LOC", "AGEB", "NOM_MUN"],
+        inplace=True,
     )
 
     # Remove null values and make integer, except fractional counts
@@ -243,7 +245,8 @@ def load_census(data_path, met_zone_codes):
     df_censo["Nivel_ninguno"] = df_censo["P15YM_SE"] + df_censo["P15PRI_IN"]
     df_censo["Nivel_primaria"] = df_censo["P15PRI_CO"] + df_censo["P15SEC_IN"]
     df_censo.drop(
-        columns=["P15YM_SE", "P15PRI_IN", "P15PRI_CO", "P15SEC_IN"], inplace=True,
+        columns=["P15YM_SE", "P15PRI_IN", "P15PRI_CO", "P15SEC_IN"],
+        inplace=True,
     )
     # Rename variables
     df_censo.rename(
