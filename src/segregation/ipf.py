@@ -132,7 +132,9 @@ def weight_ind_fast(df, ds, agebs):
         [
             df,
             pd.DataFrame(
-                data=np.zeros((len(df), len(columns))), index=df.index, columns=columns,
+                data=np.zeros((len(df), len(columns))),
+                index=df.index,
+                columns=columns,
             ),
         ],
         axis=1,
@@ -179,7 +181,10 @@ def get_income_df(ds, df_censo, df_ind, data_path, agebs):
     # Import geo data
     scodes = np.unique([a[:2] for a in agebs])
     agebs_gdf = pd.concat(
-        [gpd.read_file(f"{data_path}/agebs.zip", layer=f"{scode}a") for scode in scodes],
+        [
+            gpd.read_file(f"{data_path}/agebs.zip", layer=f"{scode}a")
+            for scode in scodes
+        ],
     )
     agebs_gdf = agebs_gdf.to_crs(agebs_gdf.estimate_utm_crs())
     agebs_gdf.columns = [i.lower() for i in agebs_gdf.columns]

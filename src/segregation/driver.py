@@ -47,7 +47,10 @@ if __name__ == "__main__":
         help="Print total execution time.",
     )
     parser.add_argument(
-        "--seed", default=123456, type=int, help="Seed for random number generation.",
+        "--seed",
+        default=123456,
+        type=int,
+        help="Seed for random number generation.",
     )
 
     args = parser.parse_args()

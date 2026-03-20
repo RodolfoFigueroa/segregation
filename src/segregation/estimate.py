@@ -25,7 +25,8 @@ def res2pd(r):
 
 def reshape_results(results_dict):
     results_reshaped = dict(
-        median_MZ=[results_dict["median_MZ"]], H=[results_dict["H"]],
+        median_MZ=[results_dict["median_MZ"]],
+        H=[results_dict["H"]],
     )
 
     for quantile in results_dict["cent_idx"]:
@@ -57,7 +58,9 @@ def get_seg_full(
     # Create the global contingency table/distribution
     seed_xr = (
         pd.crosstab(
-            [df_survey[c] for c in linking_cols], df_survey["Ingreso"], dropna=False,
+            [df_survey[c] for c in linking_cols],
+            df_survey["Ingreso"],
+            dropna=False,
         )
         .stack()
         .to_xarray()
@@ -98,7 +101,8 @@ def get_seg_full(
     # local_dev_df: contains local H deviations for all agebs(cols) for
     # all percentiles (rows)
     (H, df_cdf, norm_H_series, mean_kl_series, local_kl) = seg.global_H_index(
-        df_ind, agebs,
+        df_ind,
+        agebs,
     )
 
     results_dict["H"] = H

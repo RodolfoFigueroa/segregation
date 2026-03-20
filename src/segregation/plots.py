@@ -57,7 +57,10 @@ def plot_H_KL(df_cdf, norm_H_series, mean_kl_series, fig_path=None):
     ax_ins.yaxis.set_label_position("right")
     ax_ins.set_ylabel("$F(y)$")
     df_cdf.set_index(df_cdf.index, drop=True).plot(
-        legend=False, ax=ax_ins, color="grey", alpha=0.5,
+        legend=False,
+        ax=ax_ins,
+        color="grey",
+        alpha=0.5,
     )
     ax_ins.semilogx(df_cdf.index, df_cdf.w_MZ, color="k", lw=2)
     ax_ins.set_xlabel("$y$")
@@ -223,7 +226,12 @@ def plot_ci(points_estimates, c_intervals, ax, q, k):
 
 def plot_cis(res_bs, fig_path=None):
     fig, axg = plt.subplots(
-        2, 2, figsize=(WIDTH, WIDTH), dpi=DPI, sharex=True, sharey=True,
+        2,
+        2,
+        figsize=(WIDTH, WIDTH),
+        dpi=DPI,
+        sharex=True,
+        sharey=True,
     )
     axes = axg.ravel()
 
@@ -279,10 +287,12 @@ def make_all(met_zone_codes, opath, inpath):
     pop_income = gpd.read_file(opath / "income_quantiles.gpkg")
     df_cdf = pd.read_csv(opath / "ecdf_income_per_ageb.csv", index_col="Ingreso_orig")
     norm_H_series = pd.read_csv(
-        opath / "H_index_per_percentile.csv", index_col="Ingreso_orig",
+        opath / "H_index_per_percentile.csv",
+        index_col="Ingreso_orig",
     )
     mean_kl_series = pd.read_csv(
-        opath / "mean_KL_per_percentile.csv", index_col="Ingreso_orig",
+        opath / "mean_KL_per_percentile.csv",
+        index_col="Ingreso_orig",
     )
     C_ds = xr.open_dataset(opath / "centrality_index.nc")
     print("Done.")
@@ -340,7 +350,8 @@ def make_all(met_zone_codes, opath, inpath):
         axx.remove()
 
     sm = cm.ScalarMappable(
-        norm=mpl.colors.Normalize(vmin=-max_c, vmax=max_c), cmap="RdBu",
+        norm=mpl.colors.Normalize(vmin=-max_c, vmax=max_c),
+        cmap="RdBu",
     )
     plt.colorbar(sm, cax=cax, orientation="horizontal")
 
