@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 import time
 from pathlib import Path
@@ -8,16 +9,18 @@ import yaml
 from segregation.bootstrap import get_bs_samples
 from segregation.plots import make_all
 
+logger = logging.getLogger()
+
 
 def check_positive(value):
     try:
         value = int(value)
         if value < 0:
-            raise argparse.ArgumentTypeError(
-                f"{value} is not a postivive integer.",
-            )
+            err = f"{value} is not a positive integer."
+            raise argparse.ArgumentTypeError(err)
     except ValueError:
-        raise argparse.ArgumentTypeError(f"{value} is not a postivive integer.")
+        err = f"{value} is not a positive integer."
+        raise argparse.ArgumentTypeError(err)
     return value
 
 
@@ -26,8 +29,8 @@ if __name__ == "__main__":
         description="Estimate segregation indices using IPF with bootstraping confidence intervals.",
     )
     parser.add_argument(
-        "CVE_SUN",
-        help="Metropolitan zone identifier from the national urban system (SUN). See met_zones.yaml for a list.",
+        "CVE_MET",
+        help="Metropolitan zone identifier.",
     )
     parser.add_argument(
         "-n",
@@ -54,16 +57,22 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    assert args.n_samples <= 10000
-    print(
-        f"Initiating estimation for metropolitan zone {args.CVE_SUN}"
-        f" with {args.n_samples} samples.",
+
+    if args.n_samples > 10_000:
+        err = f"Number of samples {args.n_samples} is too large. Maximum allowed is 10,000."
+        raise ValueError(err)
+
+    msg = (
+        f"Initiating estimation for metropolitan zone {args.CVE_MET}"
+        f" with {args.n_samples} samples."
     )
+    logger.info(msg)
 
     # Load met_zones
 
     if not os.path.exists("./output/met_zones.yaml"):
-        raise Exception("met_zones.yaml not found. Run get_met_zones.py first.")
+        err = "met_zones.yaml not found. Run get_met_zones.py first."
+        raise ValueError(err)
 
     with open("./output/met_zones.yaml") as f:
         met_zones = yaml.safe_load(f)

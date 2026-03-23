@@ -1,3 +1,6 @@
+import logging
+import os
+from collections.abc import Sequence
 from pathlib import Path
 
 import dask.dataframe as dd
@@ -11,8 +14,10 @@ from scipy.optimize import brentq
 from segregation import preprocessing
 from segregation.estimate import get_seg_full
 
+logger = logging.getLogger()
 
-def ci_single(x, conf_level=0.95):
+
+def ci_single(x, conf_level: float = 0.95):
     """Computes the single confidence interval of a variable
     estimated from a sample x using the quantiles."""
 
@@ -26,7 +31,7 @@ def ci_single(x, conf_level=0.95):
     return np.quantile(x, [lower_t, upper_t], axis=0).T
 
 
-def ci_simultaneous(alpha_col, x, return_mask=False):
+def ci_simultaneous(alpha_col, x, return_mask: bool = False):
     """Computes the simulatenous alpha for confidence intervales
     of a set of related variables from a sample x, where x has
     sample vectors as rows for a per column alpha value.
@@ -100,19 +105,19 @@ def plot_ci(points_estimates, c_intervals, o_file=None):
 
 
 def get_bs_samples(
-    n_samples,
-    met_zone_codes,
-    opath,
-    data_path="./data/",
-    q=5,
-    k_list=[5, 100],
-    seed=123456,
+    n_samples: int,
+    met_zone_codes: list[int],
+    opath: os.PathLike,
+    data_path: os.PathLike = Path("./data/"),
+    q: int = 5,
+    k_list: Sequence[int] = [5, 100],
+    seed: int = 123456,
 ):
     opath = Path(opath)
     data_path = Path(data_path)
 
     # Run workflow with original sample, save all to disk
-    print("Running with original sample ...")
+    logger.info("Running with original sample ...")
 
     # Load census data
     df_censo = preprocessing.load_census(data_path, met_zone_codes)
@@ -134,10 +139,10 @@ def get_bs_samples(
         out_path=opath,
         write_to_disk=True,
     )
-    print("Done.")
+    logger.info("Done.")
 
     if n_samples == 0:
-        print("No bootstrap requested. Done.")
+        logger.info("No bootstrap requested. Done.")
         return
 
     client = Client()
@@ -154,7 +159,10 @@ def get_bs_samples(
 
     # Create dicts to store the H index and centralization indices
     # for each sample, as
-    print(f"Runnning for {n_samples} bootstrap samples ...")
+
+    msg = f"Running for {n_samples} bootstrap samples..."
+    logger.info(msg)
+
     bs_results = [None] * len(bs_idxs)
     for i, idxs in enumerate(bs_idxs):
         # Bootstrap resampling
@@ -174,6 +182,7 @@ def get_bs_samples(
         bs_results[i] = results
     results_df = dd.from_delayed(bs_results, meta=meta)
     results_df.to_parquet(opath / "bs_results.parquet")
-    print("Done.")
+
+    logger.info("Done.")
 
     client.close()

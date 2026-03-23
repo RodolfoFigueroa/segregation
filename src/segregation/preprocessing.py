@@ -1,3 +1,4 @@
+import os
 from collections import defaultdict
 from pathlib import Path
 
@@ -5,7 +6,9 @@ import numpy as np
 import pandas as pd
 
 
-def load_survey(data_path, met_zone_codes, linking_cols, q):
+def load_survey(
+    data_path: os.PathLike, met_zone_codes: list, linking_cols: list[str], q: int
+) -> pd.DataFrame:
     data_path = Path(data_path)
 
     # Folio de vivienda
@@ -73,27 +76,30 @@ def load_survey(data_path, met_zone_codes, linking_cols, q):
     df_poblacion = df_poblacion[df_poblacion["edad"] >= 15]
 
     # Merge all dataframes
-    df_ind_orig = pd.merge(df_location, df_poblacion, how="left")
-    df_ind_orig = pd.merge(df_ind_orig, ing_agg)
-    df_ind_orig = pd.merge(df_ind_orig, df_hog)
-    df_ind_orig = df_ind_orig.reset_index(drop=True)
+    df_ind_orig = (
+        df_location.merge(df_poblacion, how="left")
+        .merge(ing_agg, how="left")
+        .merge(df_hog, how="left")
+        .reset_index(drop=True)
+    )
 
     # Rename columns to match link and targer variable names
-    rename_dict = {
-        "des_mun": "Municipio",
-        "sexo": "Sexo",
-        "edad": "Edad",
-        "nivelaprob": "Nivel",
-        "edo_conyug": "EstadoConyu",
-        "inst_1": "SeguroIMSS",
-        "inst_6": "SeguroPriv",
-        "conex_inte": "ConexionInt",
-        "ing_tri": "Ingreso",
-    }
-    df_ind_orig.rename(columns=rename_dict, inplace=True)
+    df_ind_orig = df_ind_orig.rename(
+        columns={
+            "des_mun": "Municipio",
+            "sexo": "Sexo",
+            "edad": "Edad",
+            "nivelaprob": "Nivel",
+            "edo_conyug": "EstadoConyu",
+            "inst_1": "SeguroIMSS",
+            "inst_6": "SeguroPriv",
+            "conex_inte": "ConexionInt",
+            "ing_tri": "Ingreso",
+        }
+    )
 
     # Keep a df with linking variables, make variables explicitly categorical.
-    df_ind = df_ind_orig[linking_cols + ["Ingreso"]].copy()
+    df_ind = df_ind_orig[[*linking_cols, "Ingreso"]].copy()
 
     df_ind["Sexo"] = df_ind["Sexo"].astype("category")
     df_ind["Sexo"] = df_ind["Sexo"].cat.rename_categories({1: "m", 2: "f"})
@@ -141,7 +147,7 @@ def load_survey(data_path, met_zone_codes, linking_cols, q):
     return df_ind
 
 
-def load_census(data_path, met_zone_codes):
+def load_census(data_path: os.PathLike, met_zone_codes: list[int]) -> pd.DataFrame:
     data_path = Path(data_path)
 
     cols = [
@@ -180,8 +186,7 @@ def load_census(data_path, met_zone_codes):
         s_codes[s_code].append(mun_code)
 
     census_paths = [
-        data_path / f"census/RESAGEBURB_{scode:02d}_2020_csv.zip"
-        for scode in s_codes.keys()
+        data_path / f"census/RESAGEBURB_{scode:02d}_2020_csv.zip" for scode in s_codes
     ]
 
     df_list = [
@@ -196,30 +201,30 @@ def load_census(data_path, met_zone_codes):
     ]
 
     # Filter by state and met zone
-    df_list = [
+    df_list: list[pd.DataFrame] = [
         df[(df["ENTIDAD"] == scode) & (df["MUN"].isin(s_codes[scode]))].copy()
-        for df, scode in zip(df_list, s_codes.keys(), strict=False)
+        for df, scode in zip(df_list, s_codes.keys(), strict=True)
     ]
 
-    df_censo = pd.concat(df_list, ignore_index=True, copy=True)
-
     # Create CVEGEO column, and drop columns no longer useful
-    df_censo["cvegeo"] = df_censo.apply(
-        lambda x: f"{x.ENTIDAD:02}{x.MUN:03}{x.LOC:04}{x.AGEB.zfill(4)}",
-        axis=1,
-    )
-    df_censo.drop(
-        columns=["ENTIDAD", "MUN", "NOM_LOC", "LOC", "AGEB", "NOM_MUN"],
-        inplace=True,
+    df_censo = (
+        pd.concat(df_list, ignore_index=True, copy=True)
+        .assign(
+            cvegeo=lambda df: df.apply(
+                lambda x: f"{x.ENTIDAD:02}{x.MUN:03}{x.LOC:04}{x.AGEB.zfill(4)}",
+                axis=1,
+            )
+        )
+        .drop(columns=["ENTIDAD", "MUN", "NOM_LOC", "LOC", "AGEB", "NOM_MUN"])
+        .dropna()
     )
 
     # Remove null values and make integer, except fractional counts
-    df_censo = df_censo.dropna()
     int_cols = df_censo.columns.drop(["PROM_OCUP", "cvegeo"]).copy()
     df_censo = df_censo.astype(dict.fromkeys(int_cols, int))
 
     # Remove AGEBS with less than 20 in working population
-    df_censo = df_censo[df_censo["P_15YMAS"] > 20].copy()
+    df_censo = df_censo.query("P_15YMAS > 20")
 
     # Build linking variables ###
 
@@ -235,7 +240,7 @@ def load_census(data_path, met_zone_codes):
         df_censo["P_15YMAS"] - df_censo["ConexionInt_internet"]
     )
     # Drop VPH_INTER, no longer used
-    df_censo.drop(columns=["VPH_INTER", "PROM_OCUP"], inplace=True)
+    df_censo = df_censo.drop(columns=["VPH_INTER", "PROM_OCUP"])
 
     # Discretize education related variables
     #  - P15YM_SE: Población de 15 años y más sin escolaridad
@@ -244,15 +249,13 @@ def load_census(data_path, met_zone_codes):
     #  - P15SEC_IN: Población de 15 años y más con secundaria incompleta
     df_censo["Nivel_ninguno"] = df_censo["P15YM_SE"] + df_censo["P15PRI_IN"]
     df_censo["Nivel_primaria"] = df_censo["P15PRI_CO"] + df_censo["P15SEC_IN"]
-    df_censo.drop(
+    df_censo = df_censo.drop(
         columns=["P15YM_SE", "P15PRI_IN", "P15PRI_CO", "P15SEC_IN"],
-        inplace=True,
     )
     # Rename variables
-    df_censo.rename(
+    df_censo = df_censo.rename(
         {"P15SEC_CO": "Nivel_secundaria", "P18YM_PB": "Nivel_posbasica"},
         axis=1,
-        inplace=True,
     )
     # Make sure all education counts equal the total working population (>15)
     # In order to this, add missing counts to posbasic educaction assuming
@@ -267,7 +270,7 @@ def load_census(data_path, met_zone_codes):
 
     # Rename variables for working population,
     # which is the population we are interested in
-    df_censo.rename(
+    df_censo = df_censo.rename(
         {
             "P_15YMAS_F": "Sexo_f",
             "P_15YMAS_M": "Sexo_m",
@@ -275,17 +278,15 @@ def load_census(data_path, met_zone_codes):
             "POB65_MAS": "Edad_p65mas",
         },
         axis=1,
-        inplace=True,
     )
 
     # Marital Status
-    df_censo.rename(
+    df_censo = df_censo.rename(
         columns={
             "P12YM_SOLT": "EstadoConyu_soltera",
             "P12YM_CASA": "EstadoConyu_casada",
             "P12YM_SEPA": "EstadoConyu_separada",
         },
-        inplace=True,
     )
     # Adjust counts assimung almost all 12-14 are single
     diff = (
@@ -307,22 +308,23 @@ def load_census(data_path, met_zone_codes):
     df_censo["SeguroPriv_no_privado"] = (
         df_censo["P_15YMAS"] - df_censo["SeguroPriv_privado"]
     )
-    df_censo.drop(columns=["PDER_IMSS", "PAFIL_IPRIV"], inplace=True)
+    df_censo = df_censo.drop(columns=["PDER_IMSS", "PAFIL_IPRIV"])
 
-    df_censo.drop(columns="POBTOT", inplace=True)
+    df_censo = df_censo.drop(columns="POBTOT")
 
     # Reorder cols
     cols = sorted(df_censo.columns.drop(["P_15YMAS", "cvegeo"]))
-    df_censo = df_censo[["cvegeo", "P_15YMAS"] + cols]
+    df_censo = df_censo[["cvegeo", "P_15YMAS", *cols]]
 
     # Assert total counts equal total working pop
     prefixes = [c.split("_")[0] for c in cols if "_" in c]
     prefixes = np.unique(prefixes)
     for prefix in prefixes:
         pcols = [c for c in cols if prefix in c]
-        assert (df_censo[pcols].sum(axis=1) == df_censo.P_15YMAS).all()
+
+        if not (df_censo[pcols].sum(axis=1) == df_censo.P_15YMAS).all():
+            err = f"Counts for {prefix} do not sum up to total working population."
+            raise ValueError(err)
 
     # Set index to cvegeo
-    df_censo.set_index("cvegeo", inplace=True)
-
-    return df_censo
+    return df_censo.set_index("cvegeo")
