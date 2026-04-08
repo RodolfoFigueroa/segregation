@@ -167,3 +167,4 @@ income/
 merged/
 poetry.lock
 results/
+.DS_Store
